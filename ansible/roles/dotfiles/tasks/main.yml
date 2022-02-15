@@ -1,0 +1,94 @@
+---
+- name: Install stow and zsh and unzip
+  ansible.builtin.package:
+    name:
+     - stow
+     - zsh
+     - unzip
+    state: present
+  become: yes
+
+- name: Download starship
+  ansible.builtin.get_url:
+    url: https://nexus.au.lmco.com/repository/github-proxy/starship/starship/releases/download/{{ STARSHIP_VERSION }}/starship-x86_64-unknown-linux-musl.tar.gz
+    dest: /tmp/starship.tar.gz
+    mode: +x
+  become: yes
+
+- name: Install Starship
+  ansible.builtin.unarchive:
+    src: /tmp/starship.tar.gz
+    dest: /usr/local/bin
+    mode: +x
+    remote_src: yes
+  become: yes
+
+- name: Download antibody
+  ansible.builtin.get_url:
+    url: https://nexus.au.lmco.com/repository/github-proxy/getantibody/antibody/releases/download/v{{ ANTIBODY_VERSION }}/antibody_{{ ANTIBODY_VERSION }}_linux_amd64.rpm
+    dest: /tmp/antibody.rpm
+    mode: +x
+  become: yes
+
+- name: Install antibody
+  ansible.builtin.dnf:
+    name: /tmp/antibody.rpm
+    state: present
+    disable_gpg_check: true
+  become: yes
+
+- name: Create folder
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.cache
+    state: directory
+
+- name: Install antibody plugins
+  ansible.builtin.unarchive:
+    src: antibody.zip
+    dest: /home/{{ ansible_user }}/.cache/
+
+- name: Download fzf binary
+  ansible.builtin.get_url:
+    url: https://nexus.au.lmco.com/repository/github-proxy/junegunn/fzf/releases/download/{{ FZF_VERSION }}/fzf-{{ FZF_VERSION }}-linux_amd64.tar.gz
+    dest: /tmp/fzf-bin.tar.gz
+    mode: u+rw
+  become: yes
+
+- name: Install fzf binary
+  ansible.builtin.unarchive:
+    src: /tmp/fzf-bin.tar.gz
+    dest: /bin
+    mode: +x
+    remote_src: yes
+  become: yes
+
+- name: Download fzf
+  ansible.builtin.get_url:
+    url: https://nexus.au.lmco.com/repository/github-proxy/junegunn/fzf/archive/{{ FZF_VERSION }}.tar.gz
+    dest: /tmp/fzf.tar.gz
+    mode: u+rw
+  become: yes
+
+- name: Create folder
+  ansible.builtin.file:
+    path: /tmp/fzf
+    state: directory
+
+- name: Unarchive fzf
+  ansible.builtin.unarchive:
+    src: /tmp/fzf.tar.gz
+    dest: /tmp/fzf
+    remote_src: yes
+  become: yes
+
+- name: Move fzf
+  ansible.builtin.copy:
+    src: /tmp/fzf/fzf-{{ FZF_VERSION }}
+    dest: /usr/share/fzf
+    remote_src: yes
+  become: yes
+
+- name: Install fzf
+  ansible.builtin.shell:
+    cmd: /usr/share/fzf/install
+  become: yes
