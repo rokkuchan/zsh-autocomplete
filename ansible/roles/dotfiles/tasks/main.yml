@@ -10,7 +10,7 @@
 
 - name: Download starship
   ansible.builtin.get_url:
-    url: https://nexus.au.lmco.com/repository/github-proxy/starship/starship/releases/download/{{ STARSHIP_VERSION }}/starship-x86_64-unknown-linux-musl.tar.gz
+    url: https://github.com/starship/starship/releases/download/{{ STARSHIP_VERSION }}/starship-x86_64-unknown-linux-musl.tar.gz
     dest: /tmp/starship.tar.gz
     mode: +x
   become: yes
@@ -25,7 +25,7 @@
 
 - name: Download antibody
   ansible.builtin.get_url:
-    url: https://nexus.au.lmco.com/repository/github-proxy/getantibody/antibody/releases/download/v{{ ANTIBODY_VERSION }}/antibody_{{ ANTIBODY_VERSION }}_linux_amd64.rpm
+    url: https://github.com/getantibody/antibody/releases/download/v{{ ANTIBODY_VERSION }}/antibody_{{ ANTIBODY_VERSION }}_linux_amd64.rpm
     dest: /tmp/antibody.rpm
     mode: +x
   become: yes
@@ -39,17 +39,17 @@
 
 - name: Create folder
   ansible.builtin.file:
-    path: /home/{{ ansible_user }}/.cache
+    path: /home/ude006/.cache
     state: directory
 
 - name: Install antibody plugins
   ansible.builtin.unarchive:
     src: antibody.zip
-    dest: /home/{{ ansible_user }}/.cache/
+    dest: /home/ude006/.cache/
 
 - name: Download fzf binary
   ansible.builtin.get_url:
-    url: https://nexus.au.lmco.com/repository/github-proxy/junegunn/fzf/releases/download/{{ FZF_VERSION }}/fzf-{{ FZF_VERSION }}-linux_amd64.tar.gz
+    url: https://github.com/junegunn/fzf/releases/download/{{ FZF_VERSION }}/fzf-{{ FZF_VERSION }}-linux_amd64.tar.gz
     dest: /tmp/fzf-bin.tar.gz
     mode: u+rw
   become: yes
@@ -62,9 +62,9 @@
     remote_src: yes
   become: yes
 
-- name: Download fzf
-  ansible.builtin.get_url:
-    url: https://nexus.au.lmco.com/repository/github-proxy/junegunn/fzf/archive/{{ FZF_VERSION }}.tar.gz
+- name: Copy fzf
+  ansible.builtin.copy:
+    src: /home/ude006/yp-working/repos/zsh-autocomplete/files/fzf.tar.gz
     dest: /tmp/fzf.tar.gz
     mode: u+rw
   become: yes
@@ -75,7 +75,7 @@
     state: directory
 
 - name: Unarchive fzf
-  ansible.builtin.unarchive:
+  ansible.builtin.unarchive:https://github.com/junegunn/fzf/releases/download/{{ FZF_VERSION }}.tar.gz
     src: /tmp/fzf.tar.gz
     dest: /tmp/fzf
     remote_src: yes
